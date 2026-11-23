@@ -1,6 +1,6 @@
 # ai_env: Crypto Market-State API for AI Agents (design)
 
-Status: draft for approval · 2026-11-23
+Status: draft for approval (owner decisions folded in) · 2026-11-23
 
 ## 1. Intent
 
@@ -46,8 +46,8 @@ Anti-goals (these would count as failure even if the service works)
   MiCA.
 - Redistributing raw exchange data in a way that breaches exchange terms.
   Only derived and aggregated metrics are served.
-- Running costs that exceed revenue by more than a small, fixed budget (see
-  section 7).
+- Running costs above about $10/month while revenue is lower: $5 Workers
+  plan plus at most $5 Claude spend (see section 7).
 - Anyone other than the owner holding the receiving wallet's keys or recovery
   phrase.
 
@@ -66,8 +66,10 @@ Anti-goals (these would count as failure even if the service works)
 - **Payments:** x402 with USDC on the Base network, paid to the owner's own
   wallet address. Mainnet needs a facilitator; Coinbase's (CDP) is the
   default, and it also screens transactions.
-- **Claude API** for the summaries. The model and how often it runs are set by
-  cost (section 7).
+- **Claude API** for the summaries: **Claude Haiku 5.5 (`claude-haiku-5-5`),
+  every 15 minutes, hard cap $5/month** (owner's decision).
+- **Public address: the free `*.workers.dev` subdomain** (owner's decision).
+  It is used in all listings, so it is fixed before the first listing.
 - **Repository:** `stoyankinatanas-dot/Claud`, folder `ai_env/`. The repo is a
   monorepo, so CI must only touch this folder.
 
@@ -151,8 +153,9 @@ A Claude call takes the latest snapshot JSON and returns 3–5 neutral
 sentences describing the state. The prompt forbids recommendations. The
 output is checked against a banned-phrase list (buy, sell, long now, target,
 "should"...). If the check fails, the previous summary is kept and an error
-is logged. Thinking is set to `adaptive` and a stop reason of `refusal` is
-handled.
+is logged. The model is `claude-haiku-5-5` with adaptive thinking at low effort.
+A `refusal` stop reason is handled by keeping the previous summary; Haiku has
+no server-side fallback.
 
 ### 5.4 Pricing (initial)
 
@@ -212,13 +215,12 @@ request.
 
 - Cloudflare Workers paid plan $5/month (needed for cron frequency and D1
   limits). The builder confirms whether the free plan is enough.
-- Claude summaries: the **owner chooses the model and frequency**. Rough
-  numbers, assuming ~3k input / ~500 output tokens per run:
-  - Claude Opus 5.5 every 15 min: ~$60/month.
-  - Claude Opus 5.5 hourly: ~$16/month.
-  - Claude Haiku 5.5 every 15 min: ~$1.5/month.
-- Hard cap: the summariser stops if the month's Claude spend passes the
-  budget set in config.
+- Claude summaries: **Claude Haiku 5.5 every 15 minutes, ~$1.5/month**
+  (owner's decision). Alternatives considered were Opus 5.5 every 15 min
+  (~$60/month) and Opus 5.5 hourly (~$16/month).
+- Hard cap: **$5/month**, tracked from each response's `usage`. When it is
+  reached, summaries pause until the next month and the data keeps being
+  served, with the last summary marked stale.
 
 ## 8. Risks
 
