@@ -80,13 +80,13 @@ ai_env/
 
 ### Task 1: Market check (research script; it gates Task 10 only)
 
-**Files:** Create `scripts/market-check.ts`. Create `docs/market-check-2026-11.md` for the results.
+**Files:** Create `scripts/market-check.ts`. Create `docs/research/2026-11-x402-market-check.md` for the results.
 
 **Interfaces:** Produces `analysePayTo(addr: string, days: number): Promise<{ address: string; uniquePayers: number; repeatPayers: number; payments: number; usd: number }>`.
 
 - [ ] **Step 1:** List the trading/data resources from the Bazaar discovery list, which is the unauthenticated `list` endpoint of the CDP facilitator via `@coinbase/x402`. Add any Agentic.Market pages that are reachable. Collect each resource's `payTo` on `eip155:8453`.
 - [ ] **Step 2:** For each `payTo`, count USDC `Transfer` logs to that address over the last 30 days, using a public Base RPC with `eth_getLogs` in chunks of at most 10k blocks. The USDC contract on Base is `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`. A *repeat payer* is a sender with 3 or more payments. The script has no unit tests; check it by hand against a block explorer for one address.
-- [ ] **Step 3:** Write the top 20 table and a verdict into `docs/market-check-2026-11.md`. If even the leaders have fewer than about 50 repeat payers, flag **PAUSE** for the owner. Commit.
+- [ ] **Step 3:** Write the top 20 table and a verdict into `docs/research/2026-11-x402-market-check.md`. If even the leaders have fewer than about 50 repeat payers, flag **PAUSE** for the owner. Commit.
 
 ### Task 2: Exchange reachability probe (needs the owner's Cloudflare token)
 
