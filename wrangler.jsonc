@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-env",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "triggers": { "crons": ["*/5 * * * *", "*/15 * * * *"] },
+  "kv_namespaces": [{ "binding": "KV", "id": "REPLACE_ON_FIRST_DEPLOY" }],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "ai-env", "database_id": "REPLACE_ON_FIRST_DEPLOY", "migrations_dir": "migrations" }
+  ],
+  "vars": { "NETWORK": "eip155:84532" }
+}
